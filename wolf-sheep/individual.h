@@ -4,6 +4,8 @@
  * header file for the individual class
  */
 
+typedef struct Population Population;
+
 typedef struct Individual Ind;
 
 /*
@@ -13,6 +15,8 @@ typedef struct Individual Ind;
  * output: the new individual
  */
 Ind* create(int s);
+
+Population* create_pop();
 
 /*
  *
@@ -29,3 +33,5 @@ void print_individual(Ind *ind);
  * output: the new array
  */
 Ind* mutate(Ind* ind);
+
+Population* crossover(Population* pop);

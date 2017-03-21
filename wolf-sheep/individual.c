@@ -13,7 +13,6 @@
 
 #define BUFF 1000
 
-
 typedef struct Individual{
 
   int size; //the number of parameters
@@ -21,6 +20,14 @@ typedef struct Individual{
   int fitness_val; //the score of the fitness
 
 }Ind;
+
+typedef struct Population{
+
+  int size;
+  Ind* population;
+
+}Population;
+
 
 /*
  * purpose: create a new individual 
@@ -54,6 +61,28 @@ Ind* create(int s){
 
   return new_ind;
   
+}
+
+Population* create_pop(int s, Ind array[]){
+
+  Population* new_pop = (Population *) malloc(sizeof(Population));
+
+  if(new_pop == NULL){
+    printf("Out of memory\n");
+    exit(42);
+  }
+
+  new_pop->size = s;
+
+  new_pop->population = (Ind *) malloc(sizeof(Ind)*s);
+  
+  int i;
+  for(i = 0; i < s; i++){
+    new_pop->population[i] = array[i];
+  }
+
+  return new_pop;
+
 }
 
 /*
@@ -134,3 +163,29 @@ Ind* mutate(Ind* ind){
  return ind;
 }
 
+Population* crossover(Population* pop){
+
+  Population* ret_pop = (Population *) malloc(sizeof(Population));
+  ret_pop->size = pop->size;
+
+  ret_pop->population = (Ind *) malloc(sizeof(Ind)*pop->size);  
+
+  srand(time(NULL));
+
+  int cross_point = (rand() % pop->population[0]->size) + 1;
+  int index_1 = (rand() % pop->size);
+  int index_2 = (rand() % pop->size);
+
+  Ind* individual_1 = pop->population[index_1];
+  Ind* individual_2 = pop->population[index_2];
+
+  int i, tmp;
+  
+  for(i = cross_point; i < individual_1->size; i++){
+    tmp = individual_1->genes[i];
+    individual_1->genes[i] = individual_2->genes[i];
+    individual_2->genes[i] = tmp;
+  }
+  
+  
+}
