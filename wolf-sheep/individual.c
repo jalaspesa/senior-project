@@ -17,7 +17,7 @@
 typedef struct Individual{
 
   int size; //the number of parameters
-  int** genes; //an array to hold all the parameter values
+  int* genes; //an array to hold all the parameter values
   int fitness_val; //the score of the fitness
 
 }Ind;
@@ -29,7 +29,7 @@ typedef struct Individual{
  * output: the new individual
  */
 Ind* create(int s){
-
+printf("creating...\n");
   Ind* new_ind = (Ind *) malloc(sizeof(Ind));
 
   if(new_ind == NULL){
@@ -39,19 +39,18 @@ Ind* create(int s){
 
   new_ind->size = s;
   new_ind->fitness_val = 0;
-  new_ind->genes = (int **)malloc(sizeof(int *)*s);
+  new_ind->genes = (int *)malloc(sizeof(int)*s);
   
   int i;
-  
-  
 
   //fill the array with random parameter values
   for(i = 0; i < s; i++){
     int r = (rand() % 9) + 1; //TODO: pick this value
-    new_ind->genes[i] = &r;
+    //printf("%d\n", r);
+    new_ind->genes[i] = r;
 
   }
-
+  printf("\n");
   return new_ind;
   
 }
@@ -65,12 +64,9 @@ Ind* compute_fitness(Ind* ind, char *line){
   printf("%s\n", line);
 
   char* line_token;
-  char* word_token;
   line_token = (char*) malloc(BUFF * sizeof(char));
-  word_token = (char*) malloc(BUFF * sizeof(char));
   const char* delim = ",\"";
   line_token = strtok(line, delim);
-  //word_token = strtok(line_token, quote);
 
   int count = 0;
   int num_sheep;
@@ -82,7 +78,6 @@ Ind* compute_fitness(Ind* ind, char *line){
     {
       if(count == 1){
 	num_sheep = atoi(line_token);
-	//printf("sheep: %d\n", num_sheep);
       }
       else if(count == 5){
 	num_wolves = atoi(line_token);
@@ -107,11 +102,12 @@ Ind* compute_fitness(Ind* ind, char *line){
  * output: none
  */
 void print_individual(Ind *ind){
-
+  
   int i;
   for(i=0; i< ind->size; i++){
-    printf("%d\n", ind->genes[i]); //TODO make generic
+    printf("%d", ind->genes[i]); //TODO make generic
   }
+  printf("\n");
 
   printf("%d\n", ind->fitness_val);
   printf("%d\n", ind->size);
@@ -125,11 +121,12 @@ void print_individual(Ind *ind){
  */
 Ind* mutate(Ind* ind){
   srand(time(NULL));
+  printf("here\n");
   
  int random_index = (rand() % ind->size) + 1;
  int random_value = (rand() % 10); //TODO change value, might have to be void*
 
- ind->genes[random_index] = &random_value;
+ ind->genes[random_index] = random_value;
 
  return ind;
 }

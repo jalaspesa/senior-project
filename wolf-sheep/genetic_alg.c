@@ -29,8 +29,14 @@ char* readFile(char *filename){
 }
 
 int main(int argc, char **argv){
+  
 
-  Ind* ind1 = create(atoi(argv[1]));
+  if(argv[1] == NULL){
+    fprintf(stderr, "USAGE: ./run <number of parameters>\n");
+    exit(42);
+  }
+
+  Ind* ind1 = create(atoi(argv[1]));  
 		     
   char* line = readFile("plots.csv");
   printf("%s\n", line);
