@@ -24,7 +24,7 @@ typedef struct Individual{
 typedef struct Population{
 
   int size;
-  Ind* population;
+  Ind** population;
 
 }Population;
 
@@ -36,7 +36,7 @@ typedef struct Population{
  * output: the new individual
  */
 Ind* create(int s){
-printf("creating...\n");
+
   Ind* new_ind = (Ind *) malloc(sizeof(Ind));
 
   if(new_ind == NULL){
@@ -50,19 +50,18 @@ printf("creating...\n");
   
   int i;
 
+  //srand(time(NULL));
   //fill the array with random parameter values
   for(i = 0; i < s; i++){
     int r = (rand() % 9) + 1; //TODO: pick this value
-    //printf("%d\n", r);
     new_ind->genes[i] = r;
-
   }
   printf("\n");
   return new_ind;
   
 }
 
-Population* create_pop(int s, Ind array[]){
+Population* create_pop(int s, Ind* array[]){
 
   Population* new_pop = (Population *) malloc(sizeof(Population));
 
@@ -73,7 +72,13 @@ Population* create_pop(int s, Ind array[]){
 
   new_pop->size = s;
 
-  new_pop->population = (Ind *) malloc(sizeof(Ind)*s);
+  new_pop->population = (Ind **) malloc(sizeof(Ind *) * s);
+
+  int j;
+
+  for(j = 0; j < s; j++){
+    new_pop->population[j] = (Ind *) malloc(sizeof(Ind));
+  }
   
   int i;
   for(i = 0; i < s; i++){
@@ -85,8 +90,9 @@ Population* create_pop(int s, Ind array[]){
 }
 
 /*
- *
- *
+ * purpose: compute the fitness score for a certain individual
+ * input: the individual and a line from a textfile
+ * output: the individual with an updated fitness score
  */
 Ind* compute_fitness(Ind* ind, char *line){
 
@@ -134,12 +140,27 @@ void print_individual(Ind *ind){
   
   int i;
   for(i=0; i< ind->size; i++){
-    printf("%d", ind->genes[i]); //TODO make generic
+    printf("%d ", ind->genes[i]); //TODO make generic
   }
   printf("\n");
 
-  printf("%d\n", ind->fitness_val);
-  printf("%d\n", ind->size);
+  //printf("%d\n", ind->fitness_val);
+  //printf("%d\n", ind->size);
+
+}
+
+/*
+ * purpose: print a population to standard out
+ * input: the population to be printed
+ * output: none
+ */
+void print_population(Population* pop){
+  
+  int i;
+  for(i=0; i< pop->size; i++){
+    print_individual(pop->population[i]);
+  }
+  printf("\n");
 
 }
 
@@ -150,39 +171,83 @@ void print_individual(Ind *ind){
  */
 Ind* mutate(Ind* ind){
   srand(time(NULL));
-  printf("here\n");
   
- int random_index = (rand() % ind->size) + 1;
- int random_value = (rand() % 10); //TODO change value, might have to be void*
+  int random_index = (rand() % ind->size);
+  int random_value = (rand() % 10); //TODO change value, might have to be void*
 
- ind->genes[random_index] = random_value;
+  ind->genes[random_index] = random_value;
 
- return ind;
+  return ind;
 }
 
+/*
+ * purpose: this function goes through the current population, selects to random 
+ * individuals, and crosses over their values at a certain point in the array
+ * input: the old population
+ * output: the new population
+ */
 Population* crossover(Population* pop){
 
+  //this will hold the new population
   Population* ret_pop = (Population *) malloc(sizeof(Population));
   ret_pop->size = pop->size;
 
-  ret_pop->population = (Ind *) malloc(sizeof(Ind)*pop->size);  
+  ret_pop->population = (Ind **) malloc(sizeof(Ind *) * ret_pop->size);
+
+  int j;
+
+  for(j = 0; j < ret_pop->size; j++){
+    ret_pop->population[j] = (Ind *) malloc(sizeof(Ind));
+  }
 
   srand(time(NULL));
+    
+  int i, k, tmp;
+  //this loop selects two individuals at a time
+  for(k=0; k < ret_pop->size; k+=2){
+    //random point to cross over
+    int cross_point = (rand() % pop->population[0]->size) + 1;
+    printf("Crossover: %d\n", cross_point);
+    
+    //select random individuals to be crossed over
+    int index_1 = (rand() % pop->size);
+    int index_2 = (rand() % pop->size);
 
-  int cross_point = (rand() % pop->population[0]->size) + 1;
-  int index_1 = (rand() % pop->size);
-  int index_2 = (rand() % pop->size);
+   
 
-  Ind* individual_1 = pop->population[index_1];
-  Ind* individual_2 = pop->population[index_2];
+    //get the random individuals
+    Ind* individual_1 = pop->population[index_1];
+    Ind* individual_2 = pop->population[index_2];
+    printf("index1, index2: %d, %d\n", index_1, index_2);
 
-  int i, tmp;
-  
-  for(i = cross_point; i < individual_1->size; i++){
-    tmp = individual_1->genes[i];
-    individual_1->genes[i] = individual_2->genes[i];
-    individual_2->genes[i] = tmp;
-  }
-  
-  
+    int count;
+    for(count = 0; count < pop->population[index_1]->size; count++){
+      /*ret_pop->population[k]->genes[count] = individual_1->genes[count];
+	ret_pop->population[k+1]->genes[count] = individual_2->genes[count];*/
+      
+      ret_pop->population[k]->genes[count] = pop->population[index_1]->genes[count];
+      ret_pop->population[k+1]->genes[count] = pop->population[index_2]->genes[count];
+    }
+    
+    //cross over their values
+    print_individual(ret_pop->population[k]);
+    printf("fuck out lives\n");
+    print_individual(ret_pop->population[k+1]);
+
+    for(i = cross_point; i < individual_1->size; i++){
+      //printf("%d\n", i);
+      tmp = ret_pop->population[k]->genes[i];
+      ret_pop->population[k]->genes[i] = ret_pop->population[k+1]->genes[i];
+      ret_pop->population[k+1]->genes[i] = tmp;
+    }
+
+    // printf("out of inner loop\n");
+    //add them to the new array of individuals
+
+
+    // ret_pop->population[k] = individual_1;
+    //ret_pop->population[k+1] = individual_2;
+  }  
+
+  return ret_pop;
 }

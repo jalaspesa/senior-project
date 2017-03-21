@@ -14,6 +14,11 @@
 #include "individual.h"
 
 //TODO: find the size of a line in the file and replace 53 and 52 with that number
+/*
+ * purpose: read in the output file and return the correct line
+ * input: the filename
+ * output: the line of the file
+ */
 char* readFile(char *filename){
 
   FILE *fp;
@@ -30,24 +35,34 @@ char* readFile(char *filename){
 
 int main(int argc, char **argv){
   
-
   if(argv[1] == NULL){
     fprintf(stderr, "USAGE: ./run <number of parameters>\n");
     exit(42);
   }
 
-  Ind* ind1 = create(atoi(argv[1]));  
-		     
+  Ind* ind1 = create(atoi(argv[1]));
+  Ind* ind2 = create(atoi(argv[1]));
+  Ind* ind3 = create(atoi(argv[1]));
+  Ind* ind4 = create(atoi(argv[1]));  
+
+  Ind* ind_array[4] = {ind1, ind2, ind3, ind4};
+  
   char* line = readFile("plots.csv");
-  printf("%s\n", line);
+  // printf("%s\n", line);
 
   ind1 = compute_fitness(ind1, line);
-  print_individual(ind1);
+  //print_individual(ind1);
 
   ind1 = mutate(ind1);
-  printf("NEW INDIVIDUAL\n");
-  print_individual(ind1);
+  printf("NEW POPULATION\n");
+  //print_individual(ind1);
 
+  Population* new_pop = create_pop(4, ind_array);
+  print_population(new_pop);
+  new_pop = crossover(new_pop);
+  printf("------------------------\n");
+  print_population(new_pop);
+  
   int rc = fork();
   if(rc < 0){
     fprintf(stderr, "fork failed\n");
