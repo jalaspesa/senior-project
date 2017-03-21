@@ -1,9 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include "individual.h"
-#include "string.h"
-
 /*
  * individual.c
  * authors: Jessa Laspesa and Ned Taylor
@@ -11,12 +5,19 @@
  * and also chooses random parameter values for testing
  */
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include "individual.h"
+#include "string.h"
+
 #define BUFF 1000
+
 
 typedef struct Individual{
 
   int size; //the number of parameters
-  void** genes; //an array to hold all the parameter values
+  int** genes; //an array to hold all the parameter values
   int fitness_val; //the score of the fitness
 
 }Ind;
@@ -38,18 +39,18 @@ Ind* create(int s){
 
   new_ind->size = s;
   new_ind->fitness_val = 0;
-  new_ind->genes = (void *)malloc(sizeof(void *)*s);
+  new_ind->genes = (int **)malloc(sizeof(int *)*s);
   
   int i;
   
-  srand(time(NULL));
+  
 
   //fill the array with random parameter values
-  /*for(i = 0; i < s; i++){
+  for(i = 0; i < s; i++){
     int r = (rand() % 9) + 1; //TODO: pick this value
-    new_ind->genes[i] = (void *) r;
+    new_ind->genes[i] = &r;
 
-    }*/
+  }
 
   return new_ind;
   
@@ -76,6 +77,7 @@ Ind* compute_fitness(Ind* ind, char *line){
   int num_wolves;
 
   // get the number of wolves and sheep from the output file
+  //TODO figure out a way to find the values without hardcoding their positions in the output file
   while(line_token != NULL)
     {
       if(count == 1){
@@ -99,11 +101,36 @@ Ind* compute_fitness(Ind* ind, char *line){
 
 }
 
+/*
+ * purpose: print an individual to standard out
+ * input: the individual to be printed
+ * output: none
+ */
 void print_individual(Ind *ind){
+
+  int i;
+  for(i=0; i< ind->size; i++){
+    printf("%d\n", ind->genes[i]); //TODO make generic
+  }
 
   printf("%d\n", ind->fitness_val);
   printf("%d\n", ind->size);
 
 }
 
+/*
+ * purpose: mutate a random index in the array to a random value
+ * input: the old array
+ * output: the new array
+ */
+Ind* mutate(Ind* ind){
+  srand(time(NULL));
+  
+ int random_index = (rand() % ind->size) + 1;
+ int random_value = (rand() % 10); //TODO change value, might have to be void*
+
+ ind->genes[random_index] = &random_value;
+
+ return ind;
+}
 

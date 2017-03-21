@@ -1,3 +1,9 @@
+/*
+ * individual.h
+ * authors: Ned Taylor and Jessa Laspesa
+ * header file for the individual class
+ */
+
 typedef struct Individual Ind;
 
 /*
@@ -15,3 +21,11 @@ Ind* create(int s);
 Ind* compute_fitness(Ind* ind, char *line);
 
 void print_individual(Ind *ind);
+
+
+/*
+ * purpose: mutate a random index in the array to a random value
+ * input: the old array
+ * output: the new array
+ */
+Ind* mutate(Ind* ind);
