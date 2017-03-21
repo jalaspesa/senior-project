@@ -8,6 +8,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 #include "individual.h"
 
 //TODO: find the size of a line in the file and replace 53 and 52 with that number
@@ -38,7 +41,26 @@ int main(int argc, char **argv){
   ind1 = mutate(ind1);
   printf("NEW INDIVIDUAL\n");
   print_individual(ind1);
-  
+
+  int rc = fork();
+  if(rc < 0){
+    fprintf(stderr, "fork failed\n");
+    exit(1);
+  }
+  //child process
+  else if(rc == 0){
+    /*    char *exec_args[4];
+
+    exec_args[4] = NULL;
+    
+    if(execvp("../../Desktop/NetLogo\ 6.0/Behaviorsearch", exec_args) < 0){
+      perror("Error: execution failed\n");
+      exit(1);
+      }*/
+  }
+  else{
+
+  }
 }
 
 
