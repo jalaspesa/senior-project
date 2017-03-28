@@ -10,6 +10,7 @@
 #include <time.h>
 #include "individual.h"
 #include "string.h"
+//#include "mtwist-1.5/mtwist.h"
 
 #define BUFF 1000
 
@@ -198,6 +199,11 @@ Population* crossover(Population* pop){
 
   for(j = 0; j < ret_pop->size; j++){
     ret_pop->population[j] = (Ind *) malloc(sizeof(Ind));
+    if(ret_pop->population[j] == NULL){
+      printf("out of memory\n");
+      exit(42);
+    }
+    ret_pop->population[j]->size = pop->population[j]->size;
   }
 
   srand(time(NULL));
@@ -205,15 +211,17 @@ Population* crossover(Population* pop){
   int i, k, tmp;
   //this loop selects two individuals at a time
   for(k=0; k < ret_pop->size; k+=2){
+
+    int x = k;
+    int y = k+1;
     //random point to cross over
     int cross_point = (rand() % pop->population[0]->size) + 1;
     printf("Crossover: %d\n", cross_point);
     
     //select random individuals to be crossed over
     int index_1 = (rand() % pop->size);
+				    
     int index_2 = (rand() % pop->size);
-
-   
 
     //get the random individuals
     Ind* individual_1 = pop->population[index_1];
@@ -221,25 +229,41 @@ Population* crossover(Population* pop){
     printf("index1, index2: %d, %d\n", index_1, index_2);
 
     int count;
+    printf("Individual 1: ");
+    print_individual(pop->population[index_1]);
+    printf("\n");
+
+    printf("Individual 2: ");
+    print_individual(pop->population[index_2]);
+    printf("\n");
+    
     for(count = 0; count < pop->population[index_1]->size; count++){
-      /*ret_pop->population[k]->genes[count] = individual_1->genes[count];
-	ret_pop->population[k+1]->genes[count] = individual_2->genes[count];*/
-      
-      ret_pop->population[k]->genes[count] = pop->population[index_1]->genes[count];
-      ret_pop->population[k+1]->genes[count] = pop->population[index_2]->genes[count];
+      ret_pop->population[x]->genes[count] = pop->population[index_1]->genes[count];
+      ret_pop->population[y]->genes[count] = pop->population[index_2]->genes[count];
     }
+
+    //int the_count;
+
+    /* for(the_count = 0; the_count < pop->population[index_1]->size; the_count++){
+      if(ret_pop->population[x]->genes[the_count] == pop->population[index_1]->genes[the_count])
+	printf("Hooray\n");
+
+      if(ret_pop->population[y]->genes[the_count] == pop->population[index_2]->genes[the_count])
+	printf("Double Hooray\n");
+	}*/
     
     //cross over their values
-    print_individual(ret_pop->population[k]);
-    printf("fuck out lives\n");
-    print_individual(ret_pop->population[k+1]);
+    
+    /*print_individual(ret_pop->population[x]);
+    printf("-----------------------------------------------\n");
+    print_individual(ret_pop->population[y]);*/
 
-    for(i = cross_point; i < individual_1->size; i++){
+    /* for(i = cross_point; i < individual_1->size; i++){
       //printf("%d\n", i);
       tmp = ret_pop->population[k]->genes[i];
       ret_pop->population[k]->genes[i] = ret_pop->population[k+1]->genes[i];
       ret_pop->population[k+1]->genes[i] = tmp;
-    }
+      }*/
 
     // printf("out of inner loop\n");
     //add them to the new array of individuals

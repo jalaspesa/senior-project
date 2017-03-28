@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include "individual.h"
+//#include "mtwist-1.5/mtwist.h"
 
 //TODO: find the size of a line in the file and replace 53 and 52 with that number
 /*
