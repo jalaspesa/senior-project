@@ -53,3 +53,5 @@ Ind* mutate(Ind* ind);
  * output: the new population
  */
 Population* crossover(Population* pop);
+
+void copy_individual(Ind* i1, Ind* i2);

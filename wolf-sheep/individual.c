@@ -237,10 +237,12 @@ Population* crossover(Population* pop){
     print_individual(pop->population[index_2]);
     printf("\n");
     
-    for(count = 0; count < pop->population[index_1]->size; count++){
+    /* for(count = 0; count < pop->population[index_1]->size; count++){
       ret_pop->population[x]->genes[count] = pop->population[index_1]->genes[count];
       ret_pop->population[y]->genes[count] = pop->population[index_2]->genes[count];
-    }
+      }*/
+
+    copy_individual(ret_pop->population[x], pop->population[index_1]);
 
     //int the_count;
 
@@ -274,4 +276,14 @@ Population* crossover(Population* pop){
   }  
 
   return ret_pop;
+}
+
+void copy_individual(Ind* i1, Ind* i2){
+
+  int i;
+
+  for(i = 0; i < i1->size; i++){
+    i1->genes[i] = i2->genes[i];
+  }
+  
 }
