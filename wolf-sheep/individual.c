@@ -204,6 +204,7 @@ Population* crossover(Population* pop){
       exit(42);
     }
     ret_pop->population[j]->size = pop->population[j]->size;
+    ret_pop->population[j]->genes = (int *) malloc(sizeof(int)*pop->population[j]->size);
   }
 
   srand(time(NULL));
@@ -243,7 +244,10 @@ Population* crossover(Population* pop){
       }*/
 
     copy_individual(ret_pop->population[x], pop->population[index_1]);
+    copy_individual(ret_pop->population[y], pop->population[index_2]);
 
+    print_individual(ret_pop->population[x]);
+    print_individual(ret_pop->population[y]);
     //int the_count;
 
     /* for(the_count = 0; the_count < pop->population[index_1]->size; the_count++){
