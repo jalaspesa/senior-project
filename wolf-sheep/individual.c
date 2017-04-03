@@ -216,7 +216,9 @@ Population* crossover(Population* pop){
     int x = k;
     int y = k+1;
     //random point to cross over
-    int cross_point = (rand() % pop->population[0]->size) + 1;
+    int cross_point = (rand() % pop->population[0]->size);
+    while(cross_point == 0)
+      cross_point = (rand() % pop->population[0]->size);
     printf("Crossover: %d\n", cross_point);
     
     //select random individuals to be crossed over
@@ -237,46 +239,23 @@ Population* crossover(Population* pop){
     printf("Individual 2: ");
     print_individual(pop->population[index_2]);
     printf("\n");
-    
-    /* for(count = 0; count < pop->population[index_1]->size; count++){
-      ret_pop->population[x]->genes[count] = pop->population[index_1]->genes[count];
-      ret_pop->population[y]->genes[count] = pop->population[index_2]->genes[count];
-      }*/
 
     copy_individual(ret_pop->population[x], pop->population[index_1]);
     copy_individual(ret_pop->population[y], pop->population[index_2]);
 
     print_individual(ret_pop->population[x]);
     print_individual(ret_pop->population[y]);
-    //int the_count;
 
-    /* for(the_count = 0; the_count < pop->population[index_1]->size; the_count++){
-      if(ret_pop->population[x]->genes[the_count] == pop->population[index_1]->genes[the_count])
-	printf("Hooray\n");
-
-      if(ret_pop->population[y]->genes[the_count] == pop->population[index_2]->genes[the_count])
-	printf("Double Hooray\n");
-	}*/
-    
-    //cross over their values
-    
-    /*print_individual(ret_pop->population[x]);
-    printf("-----------------------------------------------\n");
-    print_individual(ret_pop->population[y]);*/
-
-    /* for(i = cross_point; i < individual_1->size; i++){
-      //printf("%d\n", i);
+    for(i = cross_point; i < individual_1->size; i++){
       tmp = ret_pop->population[k]->genes[i];
       ret_pop->population[k]->genes[i] = ret_pop->population[k+1]->genes[i];
       ret_pop->population[k+1]->genes[i] = tmp;
-      }*/
+     }
 
-    // printf("out of inner loop\n");
-    //add them to the new array of individuals
+    printf("CROSS\n");
+    print_individual(ret_pop->population[x]);
+    print_individual(ret_pop->population[y]);
 
-
-    // ret_pop->population[k] = individual_1;
-    //ret_pop->population[k+1] = individual_2;
   }  
 
   return ret_pop;
@@ -290,4 +269,10 @@ void copy_individual(Ind* i1, Ind* i2){
     i1->genes[i] = i2->genes[i];
   }
   
+}
+
+int return_index(Ind* i, int index){
+
+  return i->genes[index];
+
 }
