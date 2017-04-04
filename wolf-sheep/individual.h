@@ -23,7 +23,7 @@ Population* create_pop();
  * input: the individual and a line from a textfile
  * output: the individual with an updated fitness score
  */
-Ind* compute_fitness(Ind* ind, char *line);
+void compute_fitness(Ind* ind, char *line);
 
 /*
  * purpose: print an individual to standard out
@@ -44,7 +44,7 @@ void print_population(Population* pop);
  * input: the old array
  * output: the new array
  */
-Ind* mutate(Ind* ind);
+Population* mutate(Population* pop);
 
 /*
  * purpose: this function goes through the current population, selects to random 
@@ -55,3 +55,10 @@ Ind* mutate(Ind* ind);
 Population* crossover(Population* pop);
 
 void copy_individual(Ind* i1, Ind* i2);
+
+int return_index(Ind* i, int index);
+
+int get_pop_size(Population* p);
+
+
+Ind* get_pop_index(Population* p, int index);

@@ -54,7 +54,7 @@ Ind* create(int s){
   //srand(time(NULL));
   //fill the array with random parameter values
   for(i = 0; i < s; i++){
-    int r = (rand() % 9) + 1; //TODO: pick this value
+    int r = (rand() % 251) + 1; //TODO: pick this value
     new_ind->genes[i] = r;
   }
   printf("\n");
@@ -95,7 +95,7 @@ Population* create_pop(int s, Ind* array[]){
  * input: the individual and a line from a textfile
  * output: the individual with an updated fitness score
  */
-Ind* compute_fitness(Ind* ind, char *line){
+void compute_fitness(Ind* ind, char *line){
 
   printf("%s\n", line);
 
@@ -128,8 +128,7 @@ Ind* compute_fitness(Ind* ind, char *line){
   ind->fitness_val = abs(100 - num_sheep);
   printf("fitness: %d\n", ind->fitness_val);
 
-  return ind;
-
+ 
 }
 
 /*
@@ -170,15 +169,21 @@ void print_population(Population* pop){
  * input: the old array
  * output: the new array
  */
-Ind* mutate(Ind* ind){
-  srand(time(NULL));
-  
-  int random_index = (rand() % ind->size);
-  int random_value = (rand() % 10); //TODO change value, might have to be void*
+Population* mutate(Population* pop){
 
-  ind->genes[random_index] = random_value;
+    //only mutate a 25 percent of the time
+  int i;
+  for(i=0; i < pop->size; i++){
+    int r = (rand() % 101) + 1;
+    if( r < 25){
+      int random_index = (rand() % pop->population[i]->size);
+      int random_value = (rand() % 250); //TODO change value, might have to be void*
+      pop->population[i]->genes[random_index] = random_value;
+    }
+  }
+ 
+  return pop;
 
-  return ind;
 }
 
 /*
@@ -271,8 +276,18 @@ void copy_individual(Ind* i1, Ind* i2){
   
 }
 
+//return value at a particular index in an individual
 int return_index(Ind* i, int index){
 
   return i->genes[index];
 
 }
+
+int get_pop_size(Population* p){
+  return p->size;
+}
+
+Ind* get_pop_index(Population* p, int index){
+  return p->population[index];
+}
+
