@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
+#include <string.h>
 #include <fcntl.h>
 #include <sys/wait.h>
 #include "individual.h"
@@ -22,16 +23,23 @@
  */
 char* readFile(char *filename){
 
-  FILE *fp;
-  fp = fopen(filename, "r");
-  char *str = (char *)malloc(sizeof(char)*52);
-    
-  fseek(fp, -53, SEEK_END);
-  fgets(str, 52, fp);
-  
-  fclose(fp);
+  FILE *fd;
 
-  return str;
+  char *buff = (char*) malloc(sizeof(char)*1024);
+
+  if ((fd = fopen(filename, "r")) != NULL) // open file
+    {
+      fseek(fd, 0, SEEK_SET); // make sure start from 0
+
+      while(!feof(fd))
+	{
+	  memset(buff, 0x00, 1024); // clean buffer
+	  fscanf(fd, "%[^\n]\n", buff); // read file *prefer using fscanf
+	}
+      //      printf("Last Line :: %s\n", buff);
+    }
+
+  return buff;
 }
 
 void write_file(char* filename, Ind* i){
@@ -68,14 +76,15 @@ int main(int argc, char **argv){
 
   print_individual(ind1);
   printf("------------------------\n");
-  write_file("../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch", ind1);
+  //write_file("../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch", ind1);
   
   Ind* ind_array[4] = {ind1, ind2, ind3, ind4};
   
-  char* line = readFile("test1.bestHistory.csv");
-  // printf("%s\n", line);
-
-  ind1 = compute_fitness(ind1, line);
+    char* line = readFile("test1.bestHistory.csv");
+    printf("%s\n", line);
+    ind1 = compute_fitness(ind1, line);
+  
+  
   //print_individual(ind1);
 
   ind1 = mutate(ind1);
@@ -88,7 +97,7 @@ int main(int argc, char **argv){
   printf("------------------------\n");
   print_population(new_pop);
   
-  int rc = fork();
+  /*  int rc = fork();
   if(rc < 0){
     fprintf(stderr, "fork failed\n");
     exit(1);
@@ -98,8 +107,8 @@ int main(int argc, char **argv){
     char *exec_args[6];
     exec_args[0] = "../../Desktop/NetLogo/app/behaviorsearch/behaviorsearch_headless.sh";
     exec_args[1] = "-p";
-    exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch";
-    // exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_Sheep.bsearch";
+    //exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch";
+    exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_Sheep.bsearch";
     exec_args[3] = "-o";
     exec_args[4] = "test1";
     exec_args[5] = NULL;
@@ -111,7 +120,8 @@ int main(int argc, char **argv){
   }
   else{
     int wc = wait(NULL);
-  }
+
+    }*/
 }
 
 
