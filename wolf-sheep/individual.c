@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 #include "individual.h"
 #include "string.h"
 //#include "mtwist-1.5/mtwist.h"
@@ -49,20 +50,11 @@ Ind* create(int s){
   new_ind->fitness_val = 0;
   new_ind->genes = (int *)malloc(sizeof(int)*s);
   
-  int i;
-
-  //srand(time(NULL));
-  //fill the array with random parameter values
-  for(i = 0; i < s; i++){
-    int r = (rand() % 251) + 1; //TODO: pick this value
-    new_ind->genes[i] = r;
-  }
-  printf("\n");
   return new_ind;
   
 }
 
-Population* create_pop(int s, Ind* array[]){
+Population* create_pop(int s, Ind* array[], char* filename){
 
   Population* new_pop = (Population *) malloc(sizeof(Population));
 
@@ -77,17 +69,30 @@ Population* create_pop(int s, Ind* array[]){
 
   int j;
 
+  //allocate space for each individual
   for(j = 0; j < s; j++){
     new_pop->population[j] = (Ind *) malloc(sizeof(Ind));
   }
-  
-  int i;
+   FILE* fd = fopen(filename, "r");
+   char* str = (char *)malloc(sizeof(char)*1024);
+
+   int i;
   for(i = 0; i < s; i++){
-    new_pop->population[i] = array[i];
+    for(j=0; j < new_pop->population[i]->size; j++){
+      new_pop->population[i] = array[i];
+      char* token = (char *)malloc(sizeof(char)*20);
+      
+      //fill each individual with the given values from the text file
+      while(fgets(str,1024, fd) != NULL){
+	token = strtok(str, ",");
+	new_pop->population[i]->genes[j] = atoi(token);
+	token = strtok(NULL, ",");
+      }
+    }
   }
-
+  fclose(fd);  
   return new_pop;
-
+  
 }
 
 /*

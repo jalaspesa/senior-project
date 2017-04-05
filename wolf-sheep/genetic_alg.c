@@ -75,7 +75,7 @@ void write_file(char* filename, Ind* i){
 int main(int argc, char **argv){
   
   if(argv[1] == NULL){
-    fprintf(stderr, "USAGE: ./run <number of parameters>\n");
+    fprintf(stderr, "USAGE: ./run <number of parameters> <input text file>\n");
     exit(42);
   }
 
@@ -87,7 +87,7 @@ int main(int argc, char **argv){
     
   Ind* ind_array[4] = {ind1, ind2, ind3, ind4};
 
-  Population* new_pop = create_pop(4, ind_array);
+  Population* new_pop = create_pop(4, ind_array, argv[2]);
   print_population(new_pop);
   //crossover the individuals
   new_pop = crossover(new_pop);
@@ -122,7 +122,7 @@ int main(int argc, char **argv){
       exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch";
       //  exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_Sheep.bsearch";
       exec_args[3] = "-o";
-      exec_args[4] = "test1";
+      exec_args[4] = "results/test1";
       exec_args[5] = NULL;
       
       if(execvp(exec_args[0] , exec_args) < 0){
@@ -132,7 +132,7 @@ int main(int argc, char **argv){
     }
     else{
       int wc = wait(NULL);
-      char* line = readFile("test1.bestHistory.csv");
+      char* line = readFile("results/test1.bestHistory.csv");
       printf("%s\n", line);
       compute_fitness(get_pop_index(new_pop, i), line);
       

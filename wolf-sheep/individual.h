@@ -16,7 +16,7 @@ typedef struct Individual Ind;
  */
 Ind* create(int s);
 
-Population* create_pop();
+Population* create_pop(int s, Ind* array[], char* filename);
 
 /*
  * purpose: compute the fitness score for a certain individual
