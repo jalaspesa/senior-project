@@ -51,20 +51,20 @@ void write_file(char* filename, Ind* i){
 
   fprintf(f, "<?xml version=\"1.0\" encoding=\"us-ascii\"?>\n<!DOCTYPE search SYSTEM \"behaviorsearch.dtd\">\n<search>\n<bsearchVersionNumber>1.00</bsearchVersionNumber>\n<modelInfo>\n<modelFile>../../models/Sample Models/Biology/Wolf Sheep Predation.nlogo</modelFile>\n<modelSetupCommands>setup</modelSetupCommands>\n<modelStepCommands>go</modelStepCommands>\n<modelStopCondition>count sheep = 100</modelStopCondition>\n<modelMetricReporter>count sheep</modelMetricReporter>\n<modelMetricReporter>count wolves</modelMetricReporter>\n<modelMetricReporter>count grass / 4</modelMetricReporter>\n<modelStepLimit>100</modelStepLimit>\n</modelInfo>\n<fitnessInfo>\n<fitnessMinimized>false</fitnessMinimized>\n<fitnessCollecting>AT_FINAL_STEP</fitnessCollecting>\n<fitnessSamplingReplications>5</fitnessSamplingReplications>\n<fitnessCombineReplications>MEAN</fitnessCombineReplications>\n</fitnessInfo>\n<searchSpace>\n");
   //wolf gain from food
-  fprintf(f, "<paramSpec>[\"wolf-gain-from-food\" [50 1 50]]");
+  fprintf(f, "<paramSpec>[\"wolf-gain-from-food\" [%d 1 %d]]", return_index(i, 0), return_index(i, 0));
   fprintf(f, "</paramSpec>\n<paramSpec>[\"grass?\" false false]</paramSpec>\n<paramSpec>[\"show-energy?\" false false]</paramSpec>\n<paramSpec>");
   //number of wolves
   fprintf(f, "[\"initial-number-wolves\" [%d 1 %d]]</paramSpec>\n", return_index(i, 1), return_index(i, 1));
   //wolf reproduction rate
-  fprintf(f, "<paramSpec>[\"wolf-reproduce\" [10 1 10]]</paramSpec>\n");
+  fprintf(f, "<paramSpec>[\"wolf-reproduce\" [%d 1 %d]]</paramSpec>\n", return_index(i, 2), return_index(i, 2));
   //number of sheep
   fprintf(f, "<paramSpec>[\"initial-number-sheep\" [%d 1 %d]]</paramSpec>\n", return_index(i, 3), return_index(i, 3));
   //sheep gain from food
-  fprintf(f, "<paramSpec>[\"sheep-gain-from-food\" [25 1 25]]</paramSpec>\n"); 	  
+  fprintf(f, "<paramSpec>[\"sheep-gain-from-food\" [%d 1 %d]]</paramSpec>\n", return_index(i,4), return_index(i,4)); 	  
   //grass regrowth time
-  fprintf(f, "<paramSpec>[\"grass-regrowth-time\" [50 1 50]]</paramSpec>\n");
+  fprintf(f, "<paramSpec>[\"grass-regrowth-time\" [4 1 4]]</paramSpec>\n");
   //sheep reproduction rate
-  fprintf(f, "<paramSpec>[\"sheep-reproduce\" [10 1 10]]</paramSpec>\n</searchSpace>\n");
+    fprintf(f, "<paramSpec>[\"sheep-reproduce\" [%d 1 %d]]</paramSpec>\n</searchSpace>\n", return_index(i, 5), return_index(i, 5));
   fprintf(f, "<searchMethod type=\"StandardGA\">\n<searchMethodParameter name=\"mutation-rate\" value=\"0.05\"/>\n<searchMethodParameter name=\"population-size\" value=\"30\"/>\n<searchMethodParameter name=\"crossover-rate\" value=\"0.7\"/>\n<searchMethodParameter name=\"population-model\" value=\"generational\"/>\n<searchMethodParameter name=\"tournament-size\" value=\"3\"/>\n</searchMethod>\n<chromosomeRepresentation type=\"GrayBinaryChromosome\"/>\n");
   fprintf(f, "<evaluationLimit>300</evaluationLimit>\n</search>\n");
   fclose(f);
@@ -79,6 +79,7 @@ int main(int argc, char **argv){
     exit(42);
   }
 
+  int run_count = 0;
   Ind* ind1 = create(atoi(argv[1]));
   Ind* ind2 = create(atoi(argv[1]));
   Ind* ind3 = create(atoi(argv[1]));
@@ -89,54 +90,71 @@ int main(int argc, char **argv){
 
   Population* new_pop = create_pop(4, ind_array, argv[2]);
   print_population(new_pop);
-  //crossover the individuals
-  new_pop = crossover(new_pop);
-  printf("------------------------\n");
-  print_population(new_pop);
-
-  
-  //print_individual(ind1);
-  new_pop = mutate(new_pop);
+ 
 
   printf("NEW POPULATION\n");
   //print_individual(ind1);
 
   print_individual(ind1);
   printf("------------------------\n");
-
+  while(run_count < 5){
+    printf("run number %d\n", run_count);
   //run script for each individual
-  int i;
-  for(i=0; i < get_pop_size(new_pop); i++){
-    write_file("../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch", get_pop_index(new_pop, i));
+    int i;
+    for(i=0; i < get_pop_size(new_pop); i++){
+      write_file("../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch", get_pop_index(new_pop, i));
     
-    int rc = fork();
-    if(rc < 0){
-      fprintf(stderr, "fork failed\n");
-      exit(1);
-    }
-    //child process
-    else if(rc == 0){
-      char *exec_args[6];
-      exec_args[0] = "../../Desktop/NetLogo/app/behaviorsearch/behaviorsearch_headless.sh";
-      exec_args[1] = "-p";
-      exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch";
-      //  exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_Sheep.bsearch";
-      exec_args[3] = "-o";
-      exec_args[4] = "results/test1";
-      exec_args[5] = NULL;
-      
-      if(execvp(exec_args[0] , exec_args) < 0){
-	perror("Error: execution failed\n");
+      int rc = fork();
+      if(rc < 0){
+	fprintf(stderr, "fork failed\n");
 	exit(1);
       }
-    }
-    else{
-      int wc = wait(NULL);
-      char* line = readFile("results/test1.bestHistory.csv");
-      printf("%s\n", line);
-      compute_fitness(get_pop_index(new_pop, i), line);
+      //child process
+      else if(rc == 0){
+	char *exec_args[6];
+	exec_args[0] = "../../Desktop/NetLogo/app/behaviorsearch/behaviorsearch_headless.sh";
+	exec_args[1] = "-p";
+	exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch";
+	//  exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_Sheep.bsearch";
+	exec_args[3] = "-o";
+	exec_args[4] = "results/test1";
+	exec_args[5] = NULL;
       
+	if(execvp(exec_args[0] , exec_args) < 0){
+	  perror("Error: execution failed\n");
+	  exit(1);
+	}
+      }
+      else{
+	int wc = wait(NULL);
+	char* line = readFile("results/test1.bestHistory.csv");
+	printf("%s\n", line);
+      
+	double fit = compute_fitness(get_pop_index(new_pop, i), line);
+	printf("fitness dawg: %lf\n", fit);
+
+	if(fit <= 0.8){
+	  printf("in the looooooooop\n");
+	  //crossover the individuals
+	  new_pop = crossover(new_pop);
+	  printf("------------------------\n");
+	  print_population(new_pop);
+	
+	  //print_individual(ind1);
+	  new_pop = mutate(new_pop);
+	}
+	else{
+	  FILE* f = fopen("final_out.txt", "a");
+	  int n;
+	  for(n = 0; n < atoi(argv[1]); n++){
+	    fprintf(f, "%d ", return_index(get_pop_index(new_pop, i), n));
+	  }
+	  fclose(f);
+	  return 0;
+	}
+      }
     }
+  run_count ++;
   }
 }
 

@@ -23,7 +23,7 @@ Population* create_pop(int s, Ind* array[], char* filename);
  * input: the individual and a line from a textfile
  * output: the individual with an updated fitness score
  */
-void compute_fitness(Ind* ind, char *line);
+double compute_fitness(Ind* ind, char *line);
 
 /*
  * purpose: print an individual to standard out

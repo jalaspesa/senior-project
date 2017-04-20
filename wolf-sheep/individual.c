@@ -19,7 +19,7 @@ typedef struct Individual{
 
   int size; //the number of parameters
   int* genes; //an array to hold all the parameter values
-  int fitness_val; //the score of the fitness
+  double fitness_val; //the score of the fitness
 
 }Ind;
 
@@ -69,29 +69,46 @@ Population* create_pop(int s, Ind* array[], char* filename){
 
   int j;
 
+  
   //allocate space for each individual
   for(j = 0; j < s; j++){
     new_pop->population[j] = (Ind *) malloc(sizeof(Ind));
+    new_pop->population[j]->size = array[j]->size;
+    new_pop->population[j]->genes = (int *) malloc(sizeof(int)*array[j]->size);
+    //copy_individual(new_pop->population[j], array[j]);
   }
    FILE* fd = fopen(filename, "r");
    char* str = (char *)malloc(sizeof(char)*1024);
 
    int i;
-  for(i = 0; i < s; i++){
-    for(j=0; j < new_pop->population[i]->size; j++){
-      new_pop->population[i] = array[i];
-      char* token = (char *)malloc(sizeof(char)*20);
-      
-      //fill each individual with the given values from the text file
-      while(fgets(str,1024, fd) != NULL){
-	token = strtok(str, ",");
-	new_pop->population[i]->genes[j] = atoi(token);
-	token = strtok(NULL, ",");
-      }
-    }
-  }
-  fclose(fd);  
-  return new_pop;
+   
+   char* token = (char *)malloc(sizeof(char)*20);
+
+   //fill each individual with the given values from the text file
+   for(i=0; i < s ; i++){
+     str = fgets(str,1024, fd);
+     
+     str = strtok(str, "\n");
+
+     j=0;
+     while(j < new_pop->population[i]->size){
+       token = strtok(str, ",");       
+
+       while(token != NULL){
+
+	 //a single number in the text file
+	 
+	 new_pop->population[i]->genes[j] = atoi(token);
+   
+	 token = strtok(NULL, ",");
+
+	 j++;
+       }
+     }
+
+   }
+   fclose(fd);  
+   return new_pop;
   
 }
 
@@ -100,7 +117,7 @@ Population* create_pop(int s, Ind* array[], char* filename){
  * input: the individual and a line from a textfile
  * output: the individual with an updated fitness score
  */
-void compute_fitness(Ind* ind, char *line){
+double compute_fitness(Ind* ind, char *line){
 
   printf("%s\n", line);
 
@@ -130,9 +147,10 @@ void compute_fitness(Ind* ind, char *line){
   printf("sheep: %d\n", num_sheep);
   printf("wolves: %d\n", num_wolves);
 
-  ind->fitness_val = abs(100 - num_sheep);
-  printf("fitness: %d\n", ind->fitness_val);
-
+  int num = abs(100 - num_sheep);
+  ind->fitness_val = num / 1000.0; 
+  printf("fitness: %lf\n", ind->fitness_val);
+  return ind->fitness_val;
  
 }
 
