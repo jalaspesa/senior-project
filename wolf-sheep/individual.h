@@ -44,7 +44,7 @@ void print_population(Population* pop);
  * input: the old array
  * output: the new array
  */
-Population* mutate(Population* pop);
+Population* mutate(Population* pop, int mutate_rate);
 
 /*
  * purpose: this function goes through the current population, selects to random 

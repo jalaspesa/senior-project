@@ -214,13 +214,13 @@ void print_population(Population* pop){
  * input: the old array
  * output: the new array
  */
-Population* mutate(Population* pop){
+Population* mutate(Population* pop, int mutate_rate){
 
     //only mutate a 25 percent of the time
   int i;
   for(i=0; i < pop->size; i++){
     int r = (rand() % 101) + 1;
-    if( r < 25){
+    if( r < mutate_rate){
       int random_index = (rand() % pop->population[i]->size);
       //make sure new random value isn't outside the allowed range
       int min = pop->ranges[2 * random_index];

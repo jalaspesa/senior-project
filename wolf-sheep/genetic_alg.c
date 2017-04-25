@@ -74,8 +74,8 @@ void write_file(char* filename, Ind* i){
 
 int main(int argc, char **argv){
   
-  if(argv[3] == NULL || argv[2] == NULL || argv[1] == NULL){
-    fprintf(stderr, "USAGE: ./run <number of individuals> <number of parameters> <input text file>\n");
+  if(argv[4] == NULL || argv[3] == NULL || argv[2] == NULL || argv[1] == NULL){
+    fprintf(stderr, "USAGE: ./run <number of individuals> <number of parameters> <mutation rate 0-100> <input text file>\n");
     exit(42);
   }
 
@@ -89,7 +89,7 @@ int main(int argc, char **argv){
   }
   
   
-  Population* new_pop = create_pop(atoi(argv[1]), ind_array, argv[3]);
+  Population* new_pop = create_pop(atoi(argv[1]), ind_array, argv[4]);
   
   print_population(new_pop);
   
@@ -121,7 +121,8 @@ int main(int argc, char **argv){
 	exec_args[3] = "-o";
 	exec_args[4] = "results/test1";
 	exec_args[5] = NULL;
-	
+
+	printf("Running behaviorspace...\n");
 	if(execvp(exec_args[0] , exec_args) < 0){
 	  perror("Error: execution failed\n");
 	  exit(1);
@@ -147,7 +148,7 @@ int main(int argc, char **argv){
 	  //print_individual(ind1);
 	  free_pop(new_pop);
 	  
-	  new_pop = mutate(p);
+	  new_pop = mutate(p, atoi(argv[3]));
 	}
 	else{
 	  FILE* f = fopen("final_out.txt", "a");
