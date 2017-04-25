@@ -60,5 +60,10 @@ int return_index(Ind* i, int index);
 
 int get_pop_size(Population* p);
 
-
 Ind* get_pop_index(Population* p, int index);
+
+void copy_range(Population* p1, Population* p2);
+
+void free_pop(Population *p);
+
+void free_individual(Ind* individual);

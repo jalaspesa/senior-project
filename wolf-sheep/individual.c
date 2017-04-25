@@ -27,6 +27,7 @@ typedef struct Population{
 
   int size;
   Ind** population;
+  int* ranges; //array to hold the parameter ranges
 
 }Population;
 
@@ -66,6 +67,7 @@ Population* create_pop(int s, Ind* array[], char* filename){
   new_pop->size = s;
 
   new_pop->population = (Ind **) malloc(sizeof(Ind *) * s);
+  new_pop->ranges = (int *) malloc(sizeof(int) * array[0]->size * 2);
 
   int j;
 
@@ -84,28 +86,44 @@ Population* create_pop(int s, Ind* array[], char* filename){
    
    char* token = (char *)malloc(sizeof(char)*20);
 
+   //read in the first line and tokenize
+   str = fgets(str,1024, fd);
+   str = strtok(str, "\n");
+   token = strtok(str, ",");
+
+   //this line is the line that holds the range values
+   int n = 0;
+   //populate ranges array
+   while(n < array[0]->size * 2){
+     while(token != NULL){
+       new_pop->ranges[n] = atoi(token);
+       
+       token = strtok(NULL, ",");
+       n++;
+     }	   
+   }
+   
    //fill each individual with the given values from the text file
    for(i=0; i < s ; i++){
      str = fgets(str,1024, fd);
      
      str = strtok(str, "\n");
-
+     token = strtok(str, ",");
+       
      j=0;
-     while(j < new_pop->population[i]->size){
-       token = strtok(str, ",");       
-
-       while(token != NULL){
-
-	 //a single number in the text file
-	 
-	 new_pop->population[i]->genes[j] = atoi(token);
-   
-	 token = strtok(NULL, ",");
-
-	 j++;
-       }
+     while(token != NULL){
+       
+       //a single number in the text file
+       printf("%s\n", token);       
+       new_pop->population[i]->genes[j] = atoi(token);
+       
+       token = strtok(NULL, ",");
+       j++;  
      }
-
+   }//END FOR LOOP
+   
+   for(n=0; n < array[0]->size * 2; n++){
+     printf("index %d: %d \n", n, new_pop->ranges[n]); 
    }
    fclose(fd);  
    return new_pop;
@@ -147,8 +165,12 @@ double compute_fitness(Ind* ind, char *line){
   printf("sheep: %d\n", num_sheep);
   printf("wolves: %d\n", num_wolves);
 
-  int num = abs(100 - num_sheep);
-  ind->fitness_val = num / 1000.0; 
+  if(num_sheep <= 100)
+    ind->fitness_val = num_sheep / 100.0;
+  else{
+    int num = abs(100 - num_sheep);
+    ind->fitness_val = (100 - num) / 100.0;
+  }
   printf("fitness: %lf\n", ind->fitness_val);
   return ind->fitness_val;
  
@@ -200,7 +222,11 @@ Population* mutate(Population* pop){
     int r = (rand() % 101) + 1;
     if( r < 25){
       int random_index = (rand() % pop->population[i]->size);
-      int random_value = (rand() % 250); //TODO change value, might have to be void*
+      //make sure new random value isn't outside the allowed range
+      int min = pop->ranges[2 * random_index];
+      int max = pop->ranges[(2 * random_index) + 1];
+      
+      int random_value = (rand() % max) + min; 
       pop->population[i]->genes[random_index] = random_value;
     }
   }
@@ -271,6 +297,8 @@ Population* crossover(Population* pop){
     copy_individual(ret_pop->population[x], pop->population[index_1]);
     copy_individual(ret_pop->population[y], pop->population[index_2]);
 
+    //copy_range(pop, ret_pop);
+
     print_individual(ret_pop->population[x]);
     print_individual(ret_pop->population[y]);
 
@@ -312,5 +340,34 @@ int get_pop_size(Population* p){
 
 Ind* get_pop_index(Population* p, int index){
   return p->population[index];
+}
+
+void copy_range(Population* p1, Population* p2){
+  
+  int i;
+  p1->ranges = (int *) malloc(sizeof(int) * p2->population[0]->size * 2);
+  for(i = 0; i < p2->population[i]->size; i++){
+
+    int num = p2->population[i]->size * 2;
+    p1->ranges[num] = p2->ranges[num];
+  }
+  
+}
+
+void free_pop(Population *p){
+
+  int i;
+  for(i = 0; i < p->size; i++){
+    free_individual(p->population[i]);
+  }
+  free(p->ranges);
+  
+}
+
+void free_individual(Ind* individual){
+
+  free(individual->genes);
+  free(individual);
+  
 }
 

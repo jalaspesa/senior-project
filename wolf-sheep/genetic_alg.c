@@ -21,7 +21,7 @@
  * output: the line of the file
  */
 char* readFile(char *filename){
-
+  
   FILE *fd;
 
   char *buff = (char*) malloc(sizeof(char)*1024);
@@ -74,36 +74,38 @@ void write_file(char* filename, Ind* i){
 
 int main(int argc, char **argv){
   
-  if(argv[1] == NULL){
-    fprintf(stderr, "USAGE: ./run <number of parameters> <input text file>\n");
+  if(argv[3] == NULL || argv[2] == NULL || argv[1] == NULL){
+    fprintf(stderr, "USAGE: ./run <number of individuals> <number of parameters> <input text file>\n");
     exit(42);
   }
 
   int run_count = 0;
-  Ind* ind1 = create(atoi(argv[1]));
-  Ind* ind2 = create(atoi(argv[1]));
-  Ind* ind3 = create(atoi(argv[1]));
-  Ind* ind4 = create(atoi(argv[1]));  
-
-    
-  Ind* ind_array[4] = {ind1, ind2, ind3, ind4};
-
-  Population* new_pop = create_pop(4, ind_array, argv[2]);
+  Ind* ind_array[atoi(argv[1])];
+  Ind* ind1;
+  int j;
+  for(j=0; j < atoi(argv[1]); j ++){
+    ind1 = create(atoi(argv[2]));
+    ind_array[j] = ind1;
+  }
+  
+  
+  Population* new_pop = create_pop(atoi(argv[1]), ind_array, argv[3]);
+  
   print_population(new_pop);
- 
-
+  
+  
   printf("NEW POPULATION\n");
   //print_individual(ind1);
-
+  
   print_individual(ind1);
   printf("------------------------\n");
   while(run_count < 5){
     printf("run number %d\n", run_count);
-  //run script for each individual
+    //run script for each individual
     int i;
     for(i=0; i < get_pop_size(new_pop); i++){
       write_file("../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch", get_pop_index(new_pop, i));
-    
+      
       int rc = fork();
       if(rc < 0){
 	fprintf(stderr, "fork failed\n");
@@ -119,7 +121,7 @@ int main(int argc, char **argv){
 	exec_args[3] = "-o";
 	exec_args[4] = "results/test1";
 	exec_args[5] = NULL;
-      
+	
 	if(execvp(exec_args[0] , exec_args) < 0){
 	  perror("Error: execution failed\n");
 	  exit(1);
@@ -129,19 +131,23 @@ int main(int argc, char **argv){
 	int wc = wait(NULL);
 	char* line = readFile("results/test1.bestHistory.csv");
 	printf("%s\n", line);
-      
+	
 	double fit = compute_fitness(get_pop_index(new_pop, i), line);
 	printf("fitness dawg: %lf\n", fit);
-
+	
 	if(fit <= 0.8){
 	  printf("in the looooooooop\n");
 	  //crossover the individuals
-	  new_pop = crossover(new_pop);
+	  Population *p;
+	  p = crossover(new_pop);
+	  copy_range(p, new_pop);
 	  printf("------------------------\n");
-	  print_population(new_pop);
-	
+	  print_population(p);
+	  
 	  //print_individual(ind1);
-	  new_pop = mutate(new_pop);
+	  free_pop(new_pop);
+	  
+	  new_pop = mutate(p);
 	}
 	else{
 	  FILE* f = fopen("final_out.txt", "a");
@@ -154,7 +160,7 @@ int main(int argc, char **argv){
 	}
       }
     }
-  run_count ++;
+    run_count ++;
   }
 }
 
