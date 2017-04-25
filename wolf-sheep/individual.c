@@ -342,14 +342,14 @@ Ind* get_pop_index(Population* p, int index){
   return p->population[index];
 }
 
-void copy_range(Population* p1, Population* p2){
+void copy_range(Population* new_pop, Population* old_pop){
   
   int i;
-  p1->ranges = (int *) malloc(sizeof(int) * p2->population[0]->size * 2);
-  for(i = 0; i < p2->population[i]->size; i++){
+  //size = number of parameters
+  new_pop->ranges = (int *) malloc(sizeof(int) * old_pop->population[0]->size * 2);
+  for(i = 0; i < old_pop->population[0]->size * 2; i++){
 
-    int num = p2->population[i]->size * 2;
-    p1->ranges[num] = p2->ranges[num];
+    new_pop->ranges[i] = old_pop->ranges[i];
   }
   
 }
