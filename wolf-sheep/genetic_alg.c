@@ -79,8 +79,10 @@ int main(int argc, char **argv){
     exit(42);
   }
 
+  //clear the file
   FILE* f = fopen("fitness.txt", "w");
   fclose(f);
+
   int run_count = 1;
   Ind* ind_array[atoi(argv[1])];
   Ind* ind1;
@@ -89,14 +91,17 @@ int main(int argc, char **argv){
     ind1 = create(atoi(argv[2]));
     ind_array[j] = ind1;
   }
-  Population* new_pop = create_pop(atoi(argv[1]), ind_array, argv[4]);
   
-  while(run_count < 25){
+
+  Population* new_pop = create_pop(atoi(argv[1]), ind_array, argv[4]);
+  int best_fitness = 0;
+ 
+  while(run_count <= 25){
     printf("run number %d\n", run_count);
     //run script for each individual
     int i;
     for(i=0; i < get_pop_size(new_pop); i++){
-      write_file("../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch", get_pop_index(new_pop, i));
+      write_file("../NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch", get_pop_index(new_pop, i));
       
       int rc = fork();
       if(rc < 0){
@@ -106,9 +111,9 @@ int main(int argc, char **argv){
       //child process
       else if(rc == 0){
 	char *exec_args[6];
-	exec_args[0] = "../../Desktop/NetLogo/app/behaviorsearch/behaviorsearch_headless.sh";
+	exec_args[0] = "../NetLogo/app/behaviorsearch/behaviorsearch_headless.sh";
 	exec_args[1] = "-p";
-	exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch";
+	exec_args[2] = "../NetLogo/app/behaviorsearch/examples/Wolf_SheepEX.bsearch";
 	//  exec_args[2] = "../../Desktop/NetLogo/app/behaviorsearch/examples/Wolf_Sheep.bsearch";
 	exec_args[3] = "-o";
 	exec_args[4] = "results/test1";
@@ -121,40 +126,39 @@ int main(int argc, char **argv){
 	}
       }
       else{
+	
 	int wc = wait(NULL);
 	char* line = readFile("results/test1.bestHistory.csv");
-
 	
 	double fit = compute_fitness(get_pop_index(new_pop, i), line);
-	
+	if(fit > best_fitness)
+	  best_fitness = fit;
 	FILE* fit_file = fopen("fitness.txt", "a");
 	fprintf(fit_file, "fitness: %lf\n", fit);
 	fclose(fit_file);
-	
-	if(fit <= 0.8){
-
-	  //crossover the individuals
-	  Population *p;
-	  p = crossover(new_pop);
-	  copy_range(p, new_pop);
-
-	  free_pop(new_pop);
-	  
-	  new_pop = mutate(p, atoi(argv[3]));
-	}
-	else{
-	  FILE* f = fopen("final_out.txt", "a");
-	  int n;
-	  for(n = 0; n < atoi(argv[1]); n++){
-	    fprintf(f, "%d ", return_index(get_pop_index(new_pop, i), n));
-	  }
-	  fclose(f);
-	  return 0;
-	}
       }
+    }
+
+
+    if(best_fitness <= 0.8){
+      //crossover the individuals
+      Population *p;
+      p = crossover(new_pop);
+      copy_range(p, new_pop);
+      
+      free_pop(new_pop);
+	  
+      new_pop = mutate(p, atoi(argv[3]));
+    }
+    else{
+      FILE* f = fopen("final_out.txt", "a");
+      int n;
+      for(n = 0; n < atoi(argv[1]); n++){
+	fprintf(f, "%d ", return_index(get_pop_index(new_pop, i), n));
+      }
+      fclose(f);
+      return 0;
     }
     run_count ++;
   }
 }
-
-
