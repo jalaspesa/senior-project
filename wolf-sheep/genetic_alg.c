@@ -79,7 +79,9 @@ int main(int argc, char **argv){
     exit(42);
   }
 
-  int run_count = 0;
+  FILE* f = fopen("fitness.txt", "w");
+  fclose(f);
+  int run_count = 1;
   Ind* ind_array[atoi(argv[1])];
   Ind* ind1;
   int j;
@@ -87,19 +89,9 @@ int main(int argc, char **argv){
     ind1 = create(atoi(argv[2]));
     ind_array[j] = ind1;
   }
-  
-  
   Population* new_pop = create_pop(atoi(argv[1]), ind_array, argv[4]);
   
-  print_population(new_pop);
-  
-  
-  printf("NEW POPULATION\n");
-  //print_individual(ind1);
-  
-  print_individual(ind1);
-  printf("------------------------\n");
-  while(run_count < 5){
+  while(run_count < 25){
     printf("run number %d\n", run_count);
     //run script for each individual
     int i;
@@ -131,21 +123,21 @@ int main(int argc, char **argv){
       else{
 	int wc = wait(NULL);
 	char* line = readFile("results/test1.bestHistory.csv");
-	printf("%s\n", line);
+
 	
 	double fit = compute_fitness(get_pop_index(new_pop, i), line);
-	printf("fitness dawg: %lf\n", fit);
+	
+	FILE* fit_file = fopen("fitness.txt", "a");
+	fprintf(fit_file, "fitness: %lf\n", fit);
+	fclose(fit_file);
 	
 	if(fit <= 0.8){
-	  printf("in the looooooooop\n");
+
 	  //crossover the individuals
 	  Population *p;
 	  p = crossover(new_pop);
 	  copy_range(p, new_pop);
-	  printf("------------------------\n");
-	  print_population(p);
-	  
-	  //print_individual(ind1);
+
 	  free_pop(new_pop);
 	  
 	  new_pop = mutate(p, atoi(argv[3]));

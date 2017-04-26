@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE search SYSTEM "behaviorsearch.dtd">
+<search>
+<bsearchVersionNumber>1.00</bsearchVersionNumber>
+<modelInfo>
+<modelFile>../../models/Sample Models/Biology/Wolf Sheep Predation.nlogo</modelFile>
+<modelSetupCommands>setup</modelSetupCommands>
+<modelStepCommands>go</modelStepCommands>
+<modelStopCondition>count sheep = 100</modelStopCondition>
+<modelMetricReporter>count sheep</modelMetricReporter>
+<modelMetricReporter>count wolves</modelMetricReporter>
+<modelMetricReporter>count grass / 4</modelMetricReporter>
+<modelStepLimit>100</modelStepLimit>
+</modelInfo>
+<fitnessInfo>
+<fitnessMinimized>false</fitnessMinimized>
+<fitnessCollecting>AT_FINAL_STEP</fitnessCollecting>
+<fitnessSamplingReplications>5</fitnessSamplingReplications>
+<fitnessCombineReplications>MEAN</fitnessCombineReplications>
+</fitnessInfo>
+<searchSpace>
+<paramSpec>["wolf-gain-from-food" [12 1 12]]</paramSpec>
+<paramSpec>["grass?" false false]</paramSpec>
+<paramSpec>["show-energy?" false false]</paramSpec>
+<paramSpec>["initial-number-wolves" [50 1 50]]</paramSpec>
+<paramSpec>["wolf-reproduce" [2 1 2]]</paramSpec>
+<paramSpec>["initial-number-sheep" [100 1 100]]</paramSpec>
+<paramSpec>["sheep-gain-from-food" [30 1 30]]</paramSpec>
+<paramSpec>["grass-regrowth-time" [4 1 4]]</paramSpec>
+<paramSpec>["sheep-reproduce" [2 1 2]]</paramSpec>
+</searchSpace>
+<searchMethod type="StandardGA">
+<searchMethodParameter name="mutation-rate" value="0.05"/>
+<searchMethodParameter name="population-size" value="30"/>
+<searchMethodParameter name="crossover-rate" value="0.7"/>
+<searchMethodParameter name="population-model" value="generational"/>
+<searchMethodParameter name="tournament-size" value="3"/>
+</searchMethod>
+<chromosomeRepresentation type="GrayBinaryChromosome"/>
+<evaluationLimit>300</evaluationLimit>
+</search>
