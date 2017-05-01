@@ -1,6 +1,7 @@
 /*
  * individual.c
  * authors: Jessa Laspesa and Ned Taylor
+ * date: Spring 2017
  * purpose: this file holds all the necessary data for an individual
  * and also chooses random parameter values for testing
  */
@@ -25,8 +26,8 @@ typedef struct Individual{
 
 typedef struct Population{
 
-  int size;
-  Ind** population;
+  int size; //the size of the population
+  Ind** population; //array to hold multiple individuals
   int* ranges; //array to hold the parameter ranges
 
 }Population;
@@ -55,6 +56,13 @@ Ind* create(int s){
   
 }
 
+/*
+ * purpose: create a new population, load data from the input file 
+ * into each individual in the population, populate the ranges array given
+ * input: s, the number of individuals, array, the unpopulated array of 
+ * individuals, filename, the input file
+ * output: a new Population
+ */
 Population* create_pop(int s, Ind* array[], char* filename){
 
   Population* new_pop = (Population *) malloc(sizeof(Population));
@@ -64,6 +72,7 @@ Population* create_pop(int s, Ind* array[], char* filename){
     exit(42);
   }
 
+  //set size of the population
   new_pop->size = s;
 
   new_pop->population = (Ind **) malloc(sizeof(Ind *) * s);
@@ -91,7 +100,6 @@ Population* create_pop(int s, Ind* array[], char* filename){
    str = strtok(str, "\n");
    token = strtok(str, ",");
 
-   //this line is the line that holds the range values
    int n = 0;
    //populate ranges array
    while(n < array[0]->size * 2){
@@ -104,6 +112,9 @@ Population* create_pop(int s, Ind* array[], char* filename){
    }
    
    //fill each individual with the given values from the text file
+   //line number 2 and on in the text file
+
+   //loops through every individual in the population array
    for(i=0; i < s ; i++){
      str = fgets(str,1024, fd);
      
@@ -111,6 +122,7 @@ Population* create_pop(int s, Ind* array[], char* filename){
      token = strtok(str, ",");
        
      j=0;
+     //add the values to a single individual
      while(token != NULL){
        
        //a single number in the text file      
@@ -128,7 +140,7 @@ Population* create_pop(int s, Ind* array[], char* filename){
 
 /*
  * purpose: compute the fitness score for a certain individual
- * input: the individual and a line from a textfile
+ * input: the individual and the last line from the finalsBest.txt
  * output: the individual with an updated fitness score
  */
 double compute_fitness(Ind* ind, char *line){
@@ -140,17 +152,20 @@ double compute_fitness(Ind* ind, char *line){
   const char* delim = ",\"";
   line_token = strtok(line, delim);
 
-  int count = 0;
+  
+  int count = 0; //used to count through number of tokens
   int num_sheep;
   int num_wolves;
 
   // get the number of wolves and sheep from the output file
-  //TODO figure out a way to find the values without hardcoding their positions in the output file
+  //fitness value is: 100 sheep
   while(line_token != NULL)
     {
+      //sheep are the second token in the line
       if(count == 1){
 	num_sheep = atoi(line_token);
       }
+      //wolves are the 6th token in the line
       else if(count == 5){
 	num_wolves = atoi(line_token);
       }
@@ -158,9 +173,10 @@ double compute_fitness(Ind* ind, char *line){
       line_token = strtok(NULL, delim);
     }
 
+  
   if(num_sheep <= 100)
     ind->fitness_val = num_sheep / 100.0;
-  else{
+  else{ //number of sheep is over 100
     int num = abs(100 - num_sheep);
     ind->fitness_val = (100 - num) / 100.0;
   }
@@ -182,9 +198,6 @@ void print_individual(Ind *ind){
   }
   printf("\n");
 
-  //printf("%d\n", ind->fitness_val);
-  //printf("%d\n", ind->size);
-
 }
 
 /*
@@ -204,19 +217,23 @@ void print_population(Population* pop){
 
 /*
  * purpose: mutate a random index in the array to a random value
- * input: the old array
- * output: the new array
+ * input: the old population, the mutation rate
+ * output: the new population
  */
 Population* mutate(Population* pop, int mutate_rate){
 
   int i;
+  //go through each individual in the population
   for(i=0; i < pop->size; i++){
     int r = (rand() % 101) + 1;
+    //only mutate if the random value is less than the given rate
     if( r < mutate_rate){
+      //choose a random index for the individual
       int random_index = (rand() % pop->population[i]->size);
       //make sure new random value isn't outside the allowed range
       int min = pop->ranges[2 * random_index];
       int max = pop->ranges[(2 * random_index) + 1];
+
       
       int random_value = (rand() % max) + min; 
       pop->population[i]->genes[random_index] = random_value;
@@ -292,6 +309,11 @@ Population* crossover(Population* pop){
   return ret_pop;
 }
 
+/*
+ * purpose: copy over one individual to another
+ * input: i1, the individual being copied to, i2, the individual being copied from
+ * output: none
+ */
 void copy_individual(Ind* i1, Ind* i2){
 
   int i;
@@ -302,26 +324,47 @@ void copy_individual(Ind* i1, Ind* i2){
   
 }
 
-//return value at a particular index in an individual
+/*
+ * purpose:return value at a particular index in an individual
+ * input: i, the individual, index, the index to be returned
+ * output: the value at that index
+ */
 int return_index(Ind* i, int index){
 
   return i->genes[index];
 
 }
 
+/*
+ * purpose: get the size of the population
+ * input: the population
+ * output: the size of the population
+ */
 int get_pop_size(Population* p){
   return p->size;
 }
 
+
+/*
+ * purpose: get a specific individual in the population
+ * input: the population and the index of the individual
+ * output: the individual at that index
+ */
 Ind* get_pop_index(Population* p, int index){
   return p->population[index];
 }
 
+/*
+ * purpose: copy the values of the ranges array from one population to the other
+ * input: new_pop, the new population, old_pop, the old population
+ * output: none
+ */
 void copy_range(Population* new_pop, Population* old_pop){
   
   int i;
-  //size = number of parameters
+  //size = number of parameters of an individual
   new_pop->ranges = (int *) malloc(sizeof(int) * old_pop->population[0]->size * 2);
+  
   for(i = 0; i < old_pop->population[0]->size * 2; i++){
 
     new_pop->ranges[i] = old_pop->ranges[i];
@@ -329,6 +372,11 @@ void copy_range(Population* new_pop, Population* old_pop){
   
 }
 
+/*
+ * purpose: free the memory for a population
+ * input: the population
+ * output: none
+ */
 void free_pop(Population *p){
 
   int i;
@@ -339,6 +387,11 @@ void free_pop(Population *p){
   
 }
 
+/*
+ * purpose: free the memory for an individual
+ * input: the individual
+ * output: none
+ */
 void free_individual(Ind* individual){
 
   free(individual->genes);

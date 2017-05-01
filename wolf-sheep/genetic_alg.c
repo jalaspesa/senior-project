@@ -25,7 +25,7 @@ char* readFile(char *filename){
   FILE *fd;
 
   char *buff = (char*) malloc(sizeof(char)*1024);
-  printf("reading\n");
+  printf("reading..\n");
   if ((fd = fopen(filename, "r")) != NULL) // open file
     {
       fseek(fd, 0, SEEK_SET); // make sure start from 0
@@ -95,7 +95,8 @@ int main(int argc, char **argv){
 
   Population* new_pop = create_pop(atoi(argv[1]), ind_array, argv[4]);
   int best_fitness = 0;
- 
+
+  //run for a specific number of times
   while(run_count <= 25){
     printf("run number %d\n", run_count);
     //run script for each individual
