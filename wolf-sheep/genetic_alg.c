@@ -132,25 +132,30 @@ int main(int argc, char **argv){
 	char* line = readFile("results/test1.bestHistory.csv");
 	
 	double fit = compute_fitness(get_pop_index(new_pop, i), line);
+	//store the best fit individual in the population
 	if(fit > best_fitness)
 	  best_fitness = fit;
-	FILE* fit_file = fopen("fitness.txt", "a");
+
+	FILE* fit_file = fopen("fitness.txt", "a");	
 	fprintf(fit_file, "fitness: %lf\n", fit);
 	fclose(fit_file);
       }
     }
 
 
+    //cross over the individuals if we do not have a best fit
     if(best_fitness <= 0.8){
       //crossover the individuals
       Population *p;
       p = crossover(new_pop);
+      //copy over all the range values from one population to the next
       copy_range(p, new_pop);
       
       free_pop(new_pop);
 	  
       new_pop = mutate(p, atoi(argv[3]));
     }
+    //we have found a best fit individual
     else{
       FILE* f = fopen("final_out.txt", "a");
       int n;
