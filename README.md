@@ -22,8 +22,7 @@ The user must also choose a mutation rate as a value between 0 and 100. If the u
 
 
 
-./run <the number of individuals> <the number of parameters per individual> <the mutation rate> <the input text file>
-
+./run "the number of individuals" "the number of parameters per individual" "the mutation rate" "the input text file"
 
 The results are stored in the "results" directory after running. 
 
