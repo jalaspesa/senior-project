@@ -1,4 +1,5 @@
-# wolf-sheep program
+# Wolf-Sheep Program
+## User Manual
 
 In order to run our genetic algorithm, the user must create an input text file. The format of the file will be comma-separated. As of right now, the algorithm only runs on NetLogo's Wolf Sheep Model. The first parameter is "wolf gain from food" followed by "initial number of wolves" followed by "wolf reproduction rate" followed by "initial number of sheep" followed by "sheep gain from food" followed by "sheep reproduction rate."  The first line of the file will hold the range values for each parameter. For example, if the range of the 
 
@@ -22,7 +23,7 @@ The user must also choose a mutation rate as a value between 0 and 100. If the u
 
 
 
-./run "the number of individuals" "the number of parameters per individual" "the mutation rate" "the input text file"
+./run **the number of individuals the number of parameters per individual the mutation rate the input text file**
 
 The results are stored in the "results" directory after running. 
 
